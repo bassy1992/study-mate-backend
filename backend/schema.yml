@@ -1,0 +1,3655 @@
+openapi: 3.0.3
+info:
+  title: BECE Platform API
+  version: 1.0.0
+  description: Comprehensive API for BECE (Basic Education Certificate Examination)
+    preparation platform with course management, practice tests, and e-commerce functionality.
+  contact:
+    name: BECE Platform Support
+    email: support@beceplatform.com
+  license:
+    name: MIT License
+paths:
+  /api/:
+    get:
+      operationId: api_retrieve
+      description: API Overview and Documentation
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/health/:
+    get:
+      operationId: api_health_retrieve
+      description: Health check endpoint
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/register/:
+    post:
+      operationId: api_auth_register_create
+      description: Register a new user account with email and password
+      summary: User Registration
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomUser'
+          description: User registered successfully
+        '400':
+          description: Validation errors
+  /api/auth/login/:
+    post:
+      operationId: api_auth_login_create
+      description: Authenticate user with email and password
+      summary: User Login
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomUser'
+          description: Login successful
+        '400':
+          description: Invalid credentials
+  /api/auth/logout/:
+    post:
+      operationId: api_auth_logout_create
+      description: Logout user and invalidate authentication token
+      summary: User Logout
+      tags:
+      - Authentication
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: Logout successful
+  /api/auth/profile/:
+    get:
+      operationId: api_auth_profile_retrieve
+      description: Retrieve authenticated user profile information
+      summary: Get User Profile
+      tags:
+      - Authentication
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomUser'
+          description: ''
+    put:
+      operationId: api_auth_profile_update
+      description: Update authenticated user profile information
+      summary: Update User Profile
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomUserRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomUser'
+          description: ''
+    patch:
+      operationId: api_auth_profile_partial_update
+      description: Partially update authenticated user profile information
+      summary: Partially Update User Profile
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomUserRequest'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomUser'
+          description: ''
+  /api/auth/profile/details/:
+    get:
+      operationId: api_auth_profile_details_retrieve
+      description: Retrieve detailed user profile information and preferences
+      summary: Get User Profile Details
+      tags:
+      - Authentication
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    put:
+      operationId: api_auth_profile_details_update
+      description: Update detailed user profile information and preferences
+      summary: Update User Profile Details
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    patch:
+      operationId: api_auth_profile_details_partial_update
+      description: Partially update detailed user profile information and preferences
+      summary: Partially Update User Profile Details
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+  /api/auth/change-password/:
+    post:
+      operationId: api_auth_change_password_create
+      description: Change user password with old password verification
+      summary: Change Password
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Validation errors
+  /api/auth/achievements/:
+    get:
+      operationId: api_auth_achievements_list
+      description: Retrieve list of user achievements and badges
+      summary: Get User Achievements
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - Authentication
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAchievementList'
+          description: ''
+  /api/auth/study-sessions/:
+    get:
+      operationId: api_auth_study_sessions_list
+      description: Retrieve list of user study sessions
+      summary: Get Study Sessions
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - Authentication
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStudySessionList'
+          description: ''
+    post:
+      operationId: api_auth_study_sessions_create
+      description: Create a new study session record
+      summary: Create Study Session
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudySessionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudySessionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudySessionRequest'
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySession'
+          description: ''
+  /api/auth/dashboard/stats/:
+    get:
+      operationId: api_auth_dashboard_stats_retrieve
+      description: Retrieve user dashboard statistics including study time, achievements,
+        and recent sessions
+      summary: Get Dashboard Statistics
+      tags:
+      - Authentication
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: Dashboard statistics retrieved successfully
+  /api/courses/subjects/:
+    get:
+      operationId: api_courses_subjects_list
+      description: Retrieve list of all active subjects available in the platform
+      summary: List Subjects
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - Courses
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubjectList'
+          description: ''
+  /api/courses/levels/:
+    get:
+      operationId: api_courses_levels_list
+      description: Retrieve list of all active grade levels (JHS 1, 2, 3, etc.)
+      summary: List Levels
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - Courses
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLevelList'
+          description: ''
+  /api/courses/courses/:
+    get:
+      operationId: api_courses_courses_list
+      description: Retrieve list of published courses with optional filtering
+      summary: List Courses
+      parameters:
+      - in: query
+        name: difficulty
+        schema:
+          type: string
+        description: Filter by difficulty (beginner, intermediate, advanced)
+      - in: query
+        name: is_premium
+        schema:
+          type: boolean
+        description: Filter by premium status (true/false)
+      - in: query
+        name: level
+        schema:
+          type: string
+        description: Filter by level code (e.g., JHS1, JHS2, JHS3)
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: subject
+        schema:
+          type: string
+        description: Filter by subject code (e.g., MATH, ENG)
+      tags:
+      - Courses
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCourseListList'
+          description: ''
+  /api/courses/courses/{slug}/:
+    get:
+      operationId: api_courses_courses_retrieve_2
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+          description: ''
+  /api/courses/courses/{level}/{subject}/:
+    get:
+      operationId: api_courses_courses_retrieve
+      description: Get course by level and subject codes
+      parameters:
+      - in: path
+        name: level
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: subject
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/courses/lessons/{id}/:
+    get:
+      operationId: api_courses_lessons_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LessonDetail'
+          description: ''
+  /api/courses/lessons/{lesson_id}/complete/:
+    post:
+      operationId: api_courses_lessons_complete_create
+      description: Mark lesson as completed
+      parameters:
+      - in: path
+        name: lesson_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/courses/quizzes/:
+    get:
+      operationId: api_courses_quizzes_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQuizListList'
+          description: ''
+  /api/courses/quizzes/{slug}/:
+    get:
+      operationId: api_courses_quizzes_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quiz'
+          description: ''
+  /api/courses/quizzes/{quiz_id}/start/:
+    post:
+      operationId: api_courses_quizzes_start_create
+      description: Start a new quiz attempt
+      parameters:
+      - in: path
+        name: quiz_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/courses/quizzes/submit/:
+    post:
+      operationId: api_courses_quizzes_submit_create
+      description: Submit quiz answers
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/courses/progress/:
+    get:
+      operationId: api_courses_progress_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserProgressList'
+          description: ''
+  /api/courses/quiz-attempts/:
+    get:
+      operationId: api_courses_quiz_attempts_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQuizAttemptList'
+          description: ''
+  /api/bece/subjects/:
+    get:
+      operationId: api_bece_subjects_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBECESubjectList'
+          description: ''
+  /api/bece/years/:
+    get:
+      operationId: api_bece_years_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBECEYearList'
+          description: ''
+  /api/bece/papers/:
+    get:
+      operationId: api_bece_papers_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBECEPaperListList'
+          description: ''
+  /api/bece/papers/{id}/:
+    get:
+      operationId: api_bece_papers_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BECEPaper'
+          description: ''
+  /api/bece/practice/{subject}/:
+    get:
+      operationId: api_bece_practice_retrieve
+      description: Get BECE papers by subject
+      parameters:
+      - in: path
+        name: subject
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/bece/practice/{paper_id}/start/:
+    post:
+      operationId: api_bece_practice_start_create
+      description: Start a new BECE practice attempt
+      parameters:
+      - in: path
+        name: paper_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/bece/practice/submit/:
+    post:
+      operationId: api_bece_practice_submit_create
+      description: Submit BECE practice answers
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/bece/attempts/:
+    get:
+      operationId: api_bece_attempts_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBECEPracticeAttemptList'
+          description: ''
+  /api/bece/statistics/:
+    get:
+      operationId: api_bece_statistics_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBECEStatisticsList'
+          description: ''
+  /api/bece/dashboard/:
+    get:
+      operationId: api_bece_dashboard_retrieve
+      description: Get BECE dashboard data
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/bece/performance/{subject}/:
+    get:
+      operationId: api_bece_performance_retrieve
+      description: Get detailed performance for a specific BECE subject
+      parameters:
+      - in: path
+        name: subject
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/ecommerce/pricing-tiers/:
+    get:
+      operationId: api_ecommerce_pricing_tiers_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPricingTierList'
+          description: ''
+  /api/ecommerce/bundles/:
+    get:
+      operationId: api_ecommerce_bundles_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBundleListList'
+          description: ''
+  /api/ecommerce/bundles/{slug}/:
+    get:
+      operationId: api_ecommerce_bundles_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bundle'
+          description: ''
+  /api/ecommerce/coupons/validate/:
+    post:
+      operationId: api_ecommerce_coupons_validate_create
+      description: Validate coupon code
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/ecommerce/orders/create/:
+    post:
+      operationId: api_ecommerce_orders_create_create
+      description: Create a new order
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/ecommerce/orders/:
+    get:
+      operationId: api_ecommerce_orders_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderList'
+          description: ''
+  /api/ecommerce/payments/process/:
+    post:
+      operationId: api_ecommerce_payments_process_create
+      description: Process payment for an order
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/ecommerce/checkout/:
+    post:
+      operationId: api_ecommerce_checkout_create
+      description: Complete checkout process (create order + process payment)
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/ecommerce/purchases/:
+    get:
+      operationId: api_ecommerce_purchases_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserPurchaseList'
+          description: ''
+  /api/ecommerce/subscriptions/:
+    get:
+      operationId: api_ecommerce_subscriptions_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubscriptionList'
+          description: ''
+  /api/ecommerce/subscriptions/create/:
+    post:
+      operationId: api_ecommerce_subscriptions_create_create
+      description: Create a new subscription
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          description: No response body
+  /api/ecommerce/faqs/:
+    get:
+      operationId: api_ecommerce_faqs_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFAQList'
+          description: ''
+  /api/ecommerce/announcements/:
+    get:
+      operationId: api_ecommerce_announcements_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - tokenAuth: []
+      - type: apiKey
+        in: header
+        name: Authorization
+        description: 'Token-based authentication using format: Token <your-token>'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAnnouncementList'
+          description: ''
+components:
+  schemas:
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        achievement_type:
+          $ref: '#/components/schemas/AchievementTypeEnum'
+        icon:
+          type: string
+          maxLength: 50
+        earned_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - achievement_type
+      - description
+      - earned_at
+      - id
+      - title
+      - user
+    AchievementTypeEnum:
+      enum:
+      - quiz
+      - streak
+      - completion
+      - score
+      type: string
+      description: |-
+        * `quiz` - Quiz Achievement
+        * `streak` - Study Streak
+        * `completion` - Course Completion
+        * `score` - High Score
+    Announcement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        content:
+          type: string
+        announcement_type:
+          $ref: '#/components/schemas/AnnouncementTypeEnum'
+        is_active:
+          type: boolean
+        show_to_all:
+          type: boolean
+        valid_from:
+          type: string
+          format: date-time
+        valid_until:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        target_users:
+          type: array
+          items:
+            type: integer
+      required:
+      - content
+      - created_at
+      - id
+      - title
+    AnnouncementTypeEnum:
+      enum:
+      - info
+      - warning
+      - success
+      - maintenance
+      type: string
+      description: |-
+        * `info` - Information
+        * `warning` - Warning
+        * `success` - Success
+        * `maintenance` - Maintenance
+    Answer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        answer_text:
+          type: string
+        is_correct:
+          type: boolean
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        question:
+          type: integer
+      required:
+      - answer_text
+      - id
+      - question
+    BECEAnswer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        option_letter:
+          $ref: '#/components/schemas/OptionLetterEnum'
+        answer_text:
+          type: string
+        is_correct:
+          type: boolean
+        question:
+          type: integer
+      required:
+      - answer_text
+      - id
+      - option_letter
+      - question
+    BECEPaper:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          allOf:
+          - $ref: '#/components/schemas/BECEYear'
+          readOnly: true
+        subject:
+          allOf:
+          - $ref: '#/components/schemas/BECESubject'
+          readOnly: true
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BECEQuestion'
+          readOnly: true
+        question_count:
+          type: string
+          readOnly: true
+        paper_type:
+          $ref: '#/components/schemas/PaperTypeEnum'
+        title:
+          type: string
+          maxLength: 200
+        duration_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        total_marks:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        instructions:
+          type: string
+        is_published:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - paper_type
+      - question_count
+      - questions
+      - subject
+      - title
+      - year
+    BECEPaperList:
+      type: object
+      description: Simplified serializer for paper lists
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          allOf:
+          - $ref: '#/components/schemas/BECEYear'
+          readOnly: true
+        subject:
+          allOf:
+          - $ref: '#/components/schemas/BECESubject'
+          readOnly: true
+        paper_type:
+          $ref: '#/components/schemas/PaperTypeEnum'
+        title:
+          type: string
+          maxLength: 200
+        duration_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        total_marks:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        question_count:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - paper_type
+      - question_count
+      - subject
+      - title
+      - year
+    BECEPracticeAttempt:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/BECEUserAnswer'
+          readOnly: true
+        paper:
+          allOf:
+          - $ref: '#/components/schemas/BECEPaperList'
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        score:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        total_marks:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        percentage:
+          type: number
+          format: double
+        time_taken_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        is_completed:
+          type: boolean
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - paper
+      - started_at
+      - user
+      - user_answers
+    BECEQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/BECEAnswer'
+          readOnly: true
+        question_number:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        question_text:
+          type: string
+        image:
+          type: string
+          format: uri
+          nullable: true
+        marks:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        difficulty_level:
+          $ref: '#/components/schemas/DifficultyLevelEnum'
+        topic:
+          type: string
+          maxLength: 100
+        paper:
+          type: integer
+      required:
+      - answers
+      - id
+      - paper
+      - question_number
+      - question_text
+    BECEStatistics:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        subject:
+          allOf:
+          - $ref: '#/components/schemas/BECESubject'
+          readOnly: true
+        total_attempts:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        best_score:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        average_score:
+          type: number
+          format: double
+        total_time_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        last_attempt:
+          type: string
+          format: date-time
+          nullable: true
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - subject
+      - user
+    BECESubject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          $ref: '#/components/schemas/NameEnum'
+        display_name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        icon:
+          type: string
+          maxLength: 50
+        is_core:
+          type: boolean
+        is_active:
+          type: boolean
+      required:
+      - display_name
+      - id
+      - name
+    BECEUserAnswer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        is_correct:
+          type: boolean
+        marks_earned:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        attempt:
+          type: integer
+          readOnly: true
+        question:
+          type: integer
+        selected_answer:
+          type: integer
+          nullable: true
+      required:
+      - attempt
+      - id
+      - question
+    BECEYear:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        is_available:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - year
+    BillingCycleEnum:
+      enum:
+      - monthly
+      - yearly
+      type: string
+      description: |-
+        * `monthly` - Monthly
+        * `yearly` - Yearly
+    Bundle:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseList'
+          readOnly: true
+        course_count:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        bundle_type:
+          $ref: '#/components/schemas/BundleTypeEnum'
+        original_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        discounted_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        discount_percentage:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+        is_featured:
+          type: boolean
+        is_active:
+          type: boolean
+        valid_until:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - bundle_type
+      - course_count
+      - courses
+      - description
+      - discounted_price
+      - id
+      - original_price
+      - slug
+      - title
+    BundleList:
+      type: object
+      description: Simplified serializer for bundle lists
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        bundle_type:
+          $ref: '#/components/schemas/BundleTypeEnum'
+        original_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        discounted_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        discount_percentage:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+        is_featured:
+          type: boolean
+        course_count:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - bundle_type
+      - course_count
+      - description
+      - discounted_price
+      - id
+      - original_price
+      - slug
+      - title
+    BundleTypeEnum:
+      enum:
+      - subject
+      - level
+      - bece_prep
+      - custom
+      type: string
+      description: |-
+        * `subject` - Subject Bundle
+        * `level` - Level Bundle
+        * `bece_prep` - BECE Preparation
+        * `custom` - Custom Bundle
+    CategoryEnum:
+      enum:
+      - general
+      - courses
+      - payment
+      - technical
+      - bece
+      type: string
+      description: |-
+        * `general` - General
+        * `courses` - Courses
+        * `payment` - Payment
+        * `technical` - Technical
+        * `bece` - BECE
+    ContentTypeEnum:
+      enum:
+      - text
+      - video
+      - image
+      - audio
+      - pdf
+      type: string
+      description: |-
+        * `text` - Text
+        * `video` - Video
+        * `image` - Image
+        * `audio` - Audio
+        * `pdf` - PDF
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        subject:
+          allOf:
+          - $ref: '#/components/schemas/Subject'
+          readOnly: true
+        level:
+          allOf:
+          - $ref: '#/components/schemas/Level'
+          readOnly: true
+        lessons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lesson'
+          readOnly: true
+        lesson_count:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+        duration_hours:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        difficulty:
+          $ref: '#/components/schemas/DifficultyEnum'
+        is_premium:
+          type: boolean
+        is_published:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - description
+      - id
+      - lesson_count
+      - lessons
+      - level
+      - slug
+      - subject
+      - title
+      - updated_at
+    CourseList:
+      type: object
+      description: Simplified serializer for course lists
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        subject:
+          allOf:
+          - $ref: '#/components/schemas/Subject'
+          readOnly: true
+        level:
+          allOf:
+          - $ref: '#/components/schemas/Level'
+          readOnly: true
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+        duration_hours:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        difficulty:
+          $ref: '#/components/schemas/DifficultyEnum'
+        is_premium:
+          type: boolean
+        lesson_count:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - lesson_count
+      - level
+      - slug
+      - subject
+      - title
+    CustomUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 15
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        profile_picture:
+          type: string
+          format: uri
+          nullable: true
+        is_premium:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/UserProfile'
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - id
+      - is_premium
+      - profile
+      - username
+    CustomUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 15
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        profile_picture:
+          type: string
+          format: binary
+          nullable: true
+      required:
+      - email
+      - username
+    DifficultyEnum:
+      enum:
+      - beginner
+      - intermediate
+      - advanced
+      type: string
+      description: |-
+        * `beginner` - Beginner
+        * `intermediate` - Intermediate
+        * `advanced` - Advanced
+    DifficultyLevelEnum:
+      enum:
+      - easy
+      - medium
+      - hard
+      type: string
+      description: |-
+        * `easy` - Easy
+        * `medium` - Medium
+        * `hard` - Hard
+    FAQ:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        question:
+          type: string
+          maxLength: 300
+        answer:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        is_featured:
+          type: boolean
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - answer
+      - id
+      - question
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        contents:
+          type: array
+          items:
+            $ref: '#/components/schemas/LessonContent'
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        lesson_type:
+          $ref: '#/components/schemas/LessonTypeEnum'
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        duration_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        is_free:
+          type: boolean
+        is_published:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        course:
+          type: integer
+      required:
+      - contents
+      - course
+      - id
+      - slug
+      - title
+      - updated_at
+    LessonContent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content_type:
+          $ref: '#/components/schemas/ContentTypeEnum'
+        title:
+          type: string
+          maxLength: 200
+        text_content:
+          type: string
+        file:
+          type: string
+          format: uri
+          nullable: true
+        video_url:
+          type: string
+          format: uri
+          maxLength: 200
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        lesson:
+          type: integer
+      required:
+      - content_type
+      - id
+      - lesson
+    LessonDetail:
+      type: object
+      description: Detailed lesson serializer with progress
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        contents:
+          type: array
+          items:
+            $ref: '#/components/schemas/LessonContent'
+          readOnly: true
+        user_progress:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        lesson_type:
+          $ref: '#/components/schemas/LessonTypeEnum'
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        duration_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        is_free:
+          type: boolean
+        is_published:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        course:
+          type: integer
+      required:
+      - contents
+      - course
+      - id
+      - slug
+      - title
+      - updated_at
+      - user_progress
+    LessonTypeEnum:
+      enum:
+      - video
+      - text
+      - interactive
+      - quiz
+      type: string
+      description: |-
+        * `video` - Video
+        * `text` - Text
+        * `interactive` - Interactive
+        * `quiz` - Quiz
+    Level:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        code:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        is_active:
+          type: boolean
+      required:
+      - code
+      - id
+      - name
+    NameEnum:
+      enum:
+      - mathematics
+      - english_language
+      - integrated_science
+      - social_studies
+      - religious_moral_education
+      - ghanaian_language
+      - french
+      - ict
+      - creative_arts
+      - career_technology
+      type: string
+      description: |-
+        * `mathematics` - Mathematics
+        * `english_language` - English Language
+        * `integrated_science` - Integrated Science
+        * `social_studies` - Social Studies
+        * `religious_moral_education` - Religious and Moral Education
+        * `ghanaian_language` - Ghanaian Language
+        * `french` - French
+        * `ict` - Information and Communication Technology
+        * `creative_arts` - Creative Arts
+        * `career_technology` - Career Technology
+    OptionLetterEnum:
+      enum:
+      - A
+      - B
+      - C
+      - D
+      - E
+      type: string
+      description: |-
+        * `A` - A
+        * `B` - B
+        * `C` - C
+        * `D` - D
+        * `E` - E
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          readOnly: true
+        order_number:
+          type: string
+          readOnly: true
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        discount_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        coupon:
+          type: integer
+          nullable: true
+        bundles:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+      required:
+      - bundles
+      - created_at
+      - id
+      - items
+      - order_number
+      - updated_at
+      - user
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        bundle:
+          allOf:
+          - $ref: '#/components/schemas/BundleList'
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        order:
+          type: integer
+      required:
+      - bundle
+      - id
+      - order
+      - total_price
+      - unit_price
+    OrderStatusEnum:
+      enum:
+      - pending
+      - processing
+      - completed
+      - cancelled
+      - refunded
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `processing` - Processing
+        * `completed` - Completed
+        * `cancelled` - Cancelled
+        * `refunded` - Refunded
+    PaginatedAchievementList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Achievement'
+    PaginatedAnnouncementList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Announcement'
+    PaginatedBECEPaperListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BECEPaperList'
+    PaginatedBECEPracticeAttemptList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BECEPracticeAttempt'
+    PaginatedBECEStatisticsList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BECEStatistics'
+    PaginatedBECESubjectList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BECESubject'
+    PaginatedBECEYearList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BECEYear'
+    PaginatedBundleListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleList'
+    PaginatedCourseListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseList'
+    PaginatedFAQList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FAQ'
+    PaginatedLevelList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Level'
+    PaginatedOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+    PaginatedPricingTierList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingTier'
+    PaginatedQuizAttemptList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizAttempt'
+    PaginatedQuizListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizList'
+    PaginatedStudySessionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudySession'
+    PaginatedSubjectList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subject'
+    PaginatedSubscriptionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+    PaginatedUserProgressList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProgress'
+    PaginatedUserPurchaseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPurchase'
+    PaperTypeEnum:
+      enum:
+      - paper1
+      - paper2
+      type: string
+      description: |-
+        * `paper1` - Paper 1 - Objective
+        * `paper2` - Paper 2 - Essay
+    PasswordChangeRequest:
+      type: object
+      properties:
+        old_password:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 8
+        new_password_confirm:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+      - new_password_confirm
+      - old_password
+    PatchedCustomUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 15
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        profile_picture:
+          type: string
+          format: binary
+          nullable: true
+    PatchedUserProfileRequest:
+      type: object
+      properties:
+        school:
+          type: string
+          maxLength: 200
+        grade_level:
+          type: string
+          maxLength: 50
+        preferred_subjects: {}
+        study_goals:
+          type: string
+        daily_study_time:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 50
+        notification_preferences: {}
+    PricingTier:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        tier_type:
+          $ref: '#/components/schemas/TierTypeEnum'
+        description:
+          type: string
+        price_monthly:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        price_yearly:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        features: {}
+        max_courses:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        max_quiz_attempts:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        has_bece_access:
+          type: boolean
+        has_progress_tracking:
+          type: boolean
+        has_certificates:
+          type: boolean
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - description
+      - id
+      - name
+      - tier_type
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Answer'
+          readOnly: true
+        question_text:
+          type: string
+        question_type:
+          $ref: '#/components/schemas/QuestionTypeEnum'
+        image:
+          type: string
+          format: uri
+          nullable: true
+        points:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        explanation:
+          type: string
+        quiz:
+          type: integer
+      required:
+      - answers
+      - id
+      - question_text
+      - quiz
+    QuestionTypeEnum:
+      enum:
+      - multiple_choice
+      - true_false
+      - short_answer
+      - essay
+      type: string
+      description: |-
+        * `multiple_choice` - Multiple Choice
+        * `true_false` - True/False
+        * `short_answer` - Short Answer
+        * `essay` - Essay
+    Quiz:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        subject:
+          allOf:
+          - $ref: '#/components/schemas/Subject'
+          readOnly: true
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+          readOnly: true
+        question_count:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        quiz_type:
+          $ref: '#/components/schemas/QuizTypeEnum'
+        time_limit_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        passing_score:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        max_attempts:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        is_published:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        course:
+          type: integer
+          nullable: true
+      required:
+      - id
+      - question_count
+      - questions
+      - slug
+      - subject
+      - title
+    QuizAttempt:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAnswer'
+          readOnly: true
+        quiz:
+          allOf:
+          - $ref: '#/components/schemas/QuizList'
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        score:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        total_questions:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        time_taken_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        is_completed:
+          type: boolean
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - quiz
+      - started_at
+      - user
+      - user_answers
+    QuizList:
+      type: object
+      description: Simplified serializer for quiz lists
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        subject:
+          allOf:
+          - $ref: '#/components/schemas/Subject'
+          readOnly: true
+        quiz_type:
+          $ref: '#/components/schemas/QuizTypeEnum'
+        time_limit_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        passing_score:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        question_count:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - question_count
+      - slug
+      - subject
+      - title
+    QuizTypeEnum:
+      enum:
+      - practice
+      - assessment
+      - bece_practice
+      - mock_exam
+      type: string
+      description: |-
+        * `practice` - Practice Quiz
+        * `assessment` - Assessment
+        * `bece_practice` - BECE Practice
+        * `mock_exam` - Mock Exam
+    StudySession:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        duration_minutes:
+          type: integer
+          readOnly: true
+        subject:
+          type: string
+          maxLength: 100
+        activity_type:
+          type: string
+          maxLength: 50
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - duration_minutes
+      - id
+      - user
+    StudySessionRequest:
+      type: object
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        subject:
+          type: string
+          maxLength: 100
+        activity_type:
+          type: string
+          maxLength: 50
+    Subject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        code:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+        icon:
+          type: string
+          maxLength: 50
+        color:
+          type: string
+          maxLength: 7
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - code
+      - id
+      - name
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pricing_tier:
+          allOf:
+          - $ref: '#/components/schemas/PricingTier'
+          readOnly: true
+        billing_cycle:
+          $ref: '#/components/schemas/BillingCycleEnum'
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        next_billing_date:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/SubscriptionStatusEnum'
+        auto_renew:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - billing_cycle
+      - created_at
+      - end_date
+      - id
+      - next_billing_date
+      - pricing_tier
+      - updated_at
+      - user
+    SubscriptionStatusEnum:
+      enum:
+      - active
+      - cancelled
+      - expired
+      - suspended
+      type: string
+      description: |-
+        * `active` - Active
+        * `cancelled` - Cancelled
+        * `expired` - Expired
+        * `suspended` - Suspended
+    TierTypeEnum:
+      enum:
+      - free
+      - basic
+      - premium
+      - pro
+      type: string
+      description: |-
+        * `free` - Free
+        * `basic` - Basic
+        * `premium` - Premium
+        * `pro` - Pro
+    UserAnswer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text_answer:
+          type: string
+        is_correct:
+          type: boolean
+        points_earned:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        attempt:
+          type: integer
+          readOnly: true
+        question:
+          type: integer
+        selected_answer:
+          type: integer
+          nullable: true
+      required:
+      - attempt
+      - id
+      - question
+    UserLoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      required:
+      - email
+      - password
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        school:
+          type: string
+          maxLength: 200
+        grade_level:
+          type: string
+          maxLength: 50
+        preferred_subjects: {}
+        study_goals:
+          type: string
+        daily_study_time:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        timezone:
+          type: string
+          maxLength: 50
+        notification_preferences: {}
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - user
+    UserProfileRequest:
+      type: object
+      properties:
+        school:
+          type: string
+          maxLength: 200
+        grade_level:
+          type: string
+          maxLength: 50
+        preferred_subjects: {}
+        study_goals:
+          type: string
+        daily_study_time:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 50
+        notification_preferences: {}
+    UserProgress:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course:
+          allOf:
+          - $ref: '#/components/schemas/CourseList'
+          readOnly: true
+        lessons_completed:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        total_lessons:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        completion_percentage:
+          type: number
+          format: double
+        last_accessed:
+          type: string
+          format: date-time
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - course
+      - id
+      - user
+    UserPurchase:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        bundle:
+          allOf:
+          - $ref: '#/components/schemas/BundleList'
+          readOnly: true
+        purchased_at:
+          type: string
+          format: date-time
+          readOnly: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        is_active:
+          type: boolean
+        user:
+          type: integer
+          readOnly: true
+        order:
+          type: integer
+      required:
+      - bundle
+      - id
+      - order
+      - purchased_at
+      - user
+    UserRegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+      - password_confirm
+      - username
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
+servers:
+- url: http://127.0.0.1:8000
+  description: Development server
+- url: https://api.beceplatform.com
+  description: Production server
+tags:
+- name: Authentication
+  description: User authentication and profile management
+- name: Courses
+  description: Course management, lessons, and quizzes
+- name: BECE
+  description: BECE practice tests and performance analytics
+- name: E-commerce
+  description: Bundles, payments, and subscription management
