@@ -71,8 +71,18 @@ class BECEPaper(models.Model):
 
 class BECEQuestion(models.Model):
     """BECE-specific questions"""
+    QUESTION_TYPES = [
+        ('multiple_choice', 'Multiple Choice'),
+        ('essay', 'Essay'),
+        ('short_answer', 'Short Answer'),
+        ('true_false', 'True/False'),
+        ('fill_blank', 'Fill in the Blank'),
+        ('matching', 'Matching'),
+    ]
+    
     paper = models.ForeignKey(BECEPaper, on_delete=models.CASCADE, related_name='questions')
     question_number = models.IntegerField()
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES, default='multiple_choice')
     question_text = models.TextField()
     image = models.ImageField(upload_to='bece_questions/', null=True, blank=True)
     marks = models.IntegerField(default=1)
@@ -83,12 +93,33 @@ class BECEQuestion(models.Model):
     ], default='medium')
     topic = models.CharField(max_length=100, blank=True)
     
+    # Essay-specific fields
+    essay_instructions = models.TextField(blank=True, help_text="Instructions for essay questions")
+    word_limit = models.IntegerField(null=True, blank=True, help_text="Word limit for essay questions")
+    time_limit_minutes = models.IntegerField(null=True, blank=True, help_text="Time limit for this question")
+    
+    # Additional metadata
+    learning_objective = models.CharField(max_length=200, blank=True)
+    explanation = models.TextField(blank=True, help_text="Explanation for the correct answer")
+    
     class Meta:
         ordering = ['question_number']
         unique_together = ['paper', 'question_number']
     
     def __str__(self):
-        return f"{self.paper} - Q{self.question_number}"
+        return f"{self.paper} - Q{self.question_number} ({self.get_question_type_display()})"
+    
+    @property
+    def is_multiple_choice(self):
+        return self.question_type == 'multiple_choice'
+    
+    @property
+    def is_essay(self):
+        return self.question_type == 'essay'
+    
+    @property
+    def formatted_marks(self):
+        return f"{self.marks} mark{'s' if self.marks != 1 else ''}"
 
 
 class BECEAnswer(models.Model):
@@ -127,12 +158,36 @@ class BECEUserAnswer(models.Model):
     """User answers for BECE questions"""
     attempt = models.ForeignKey(BECEPracticeAttempt, on_delete=models.CASCADE, related_name='user_answers')
     question = models.ForeignKey(BECEQuestion, on_delete=models.CASCADE)
+    
+    # For multiple choice questions
     selected_answer = models.ForeignKey(BECEAnswer, on_delete=models.CASCADE, null=True, blank=True)
+    
+    # For essay and text-based questions
+    text_answer = models.TextField(blank=True, help_text="Text answer for essay/short answer questions")
+    
+    # Scoring and feedback
     is_correct = models.BooleanField(default=False)
     marks_earned = models.IntegerField(default=0)
+    teacher_feedback = models.TextField(blank=True, help_text="Teacher feedback for essay questions")
+    
+    # Metadata
+    answered_at = models.DateTimeField(default=timezone.now)
+    time_spent_seconds = models.IntegerField(default=0, help_text="Time spent on this question")
+    
+    class Meta:
+        unique_together = ['attempt', 'question']
     
     def __str__(self):
         return f"{self.attempt.user.email} - {self.question}"
+    
+    @property
+    def answer_preview(self):
+        """Get a preview of the answer for display"""
+        if self.selected_answer:
+            return f"Option {self.selected_answer.option_letter}: {self.selected_answer.answer_text[:50]}..."
+        elif self.text_answer:
+            return self.text_answer[:100] + "..." if len(self.text_answer) > 100 else self.text_answer
+        return "No answer provided"
 
 
 class BECEStatistics(models.Model):

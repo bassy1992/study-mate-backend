@@ -123,13 +123,49 @@ class LevelAdmin(admin.ModelAdmin):
     ordering = ('order',)
 
 
+# Inline classes need to be defined before they're used
+class LessonContentInline(admin.TabularInline):
+    model = LessonContent
+    extra = 1
+    fields = ('content_type', 'title', 'text_content', 'video_url', 'file', 'order')
+
+
+class LessonInline(admin.TabularInline):
+    model = Lesson
+    extra = 3
+    fields = ('title', 'slug', 'order', 'duration_minutes', 'video_url', 'video_file', 'is_free', 'is_published')
+    prepopulated_fields = {'slug': ('title',)}
+    verbose_name = "Lesson"
+    verbose_name_plural = "Course Lessons"
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        
+        # Add help text to fields
+        formset.form.base_fields['title'].help_text = 'e.g., "Lesson 1: Introduction to Fractions"'
+        formset.form.base_fields['order'].help_text = 'Lesson sequence (1, 2, 3, etc.)'
+        formset.form.base_fields['duration_minutes'].help_text = 'Duration in minutes'
+        formset.form.base_fields['video_url'].help_text = 'YouTube, Vimeo, or other video platform URL'
+        formset.form.base_fields['video_file'].help_text = 'Or upload video file directly'
+        formset.form.base_fields['is_free'].help_text = 'Allow access without enrollment'
+        formset.form.base_fields['is_published'].help_text = 'Make visible to students'
+        
+        return formset
+    
+    class Media:
+        css = {
+            'all': ('admin/css/lesson_inline.css',)
+        }
+
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     form = CourseAdminForm
-    list_display = ('title', 'subject', 'level', 'difficulty', 'is_premium', 'is_published', 'has_preview_video', 'created_at')
+    list_display = ('title', 'subject', 'level', 'difficulty', 'is_premium', 'is_published', 'has_preview_video', 'lesson_count', 'created_at')
     list_filter = ('subject', 'level', 'difficulty', 'is_premium', 'is_published', 'created_at')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
+    inlines = [LessonInline]
     
     fieldsets = (
         ('Basic Information', {
@@ -152,20 +188,38 @@ class CourseAdmin(admin.ModelAdmin):
         return bool(obj.preview_video_url or obj.preview_video_file)
     has_preview_video.boolean = True
     has_preview_video.short_description = 'Has Preview'
-
-
-class LessonContentInline(admin.TabularInline):
-    model = LessonContent
-    extra = 1
+    
+    def lesson_count(self, obj):
+        return obj.lessons.count()
+    lesson_count.short_description = 'Lessons'
 
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course', 'lesson_type', 'order', 'duration_minutes', 'is_free', 'is_published')
-    list_filter = ('lesson_type', 'is_free', 'is_published', 'course__subject')
+    list_display = ('title', 'course', 'lesson_type', 'order', 'duration_minutes', 'is_free', 'is_published', 'has_video')
+    list_filter = ('lesson_type', 'is_free', 'is_published', 'course__subject', 'course__level')
     search_fields = ('title', 'description', 'course__title')
     prepopulated_fields = {'slug': ('title',)}
     inlines = [LessonContentInline]
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('course', 'title', 'slug', 'description', 'lesson_type', 'order')
+        }),
+        ('Video Content', {
+            'fields': ('video_url', 'video_file', 'video_duration', 'video_thumbnail'),
+            'description': 'Add video content for this lesson. You can either provide a URL or upload a file.'
+        }),
+        ('Settings', {
+            'fields': ('duration_minutes', 'is_free', 'is_published'),
+            'description': 'Configure lesson settings and availability.'
+        }),
+    )
+    
+    def has_video(self, obj):
+        return obj.has_video
+    has_video.boolean = True
+    has_video.short_description = 'Has Video'
 
 
 class AnswerInline(admin.TabularInline):
@@ -208,3 +262,5 @@ class LessonProgressAdmin(admin.ModelAdmin):
     list_display = ('user', 'lesson', 'is_completed', 'completion_percentage', 'time_spent_minutes', 'last_accessed')
     list_filter = ('is_completed', 'lesson__course__subject', 'last_accessed')
     search_fields = ('user__email', 'lesson__title')
+
+

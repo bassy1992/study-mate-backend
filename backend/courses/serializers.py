@@ -49,6 +49,10 @@ class LessonContentSerializer(serializers.ModelSerializer):
 
 class LessonSerializer(serializers.ModelSerializer):
     contents = LessonContentSerializer(many=True, read_only=True)
+    has_video = serializers.ReadOnlyField()
+    video_embed_url = serializers.ReadOnlyField()
+    video_thumbnail_url = serializers.ReadOnlyField()
+    formatted_video_duration = serializers.ReadOnlyField()
     
     class Meta:
         model = Lesson

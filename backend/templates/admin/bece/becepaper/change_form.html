@@ -1,0 +1,104 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .bece-exam-help {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .bece-exam-help h3 {
+            margin-top: 0;
+            color: #0073aa;
+        }
+        
+        .bece-exam-help ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .bece-exam-help li {
+            margin: 5px 0;
+        }
+        
+        .question-type-guide {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .question-type-guide strong {
+            color: #856404;
+        }
+        
+        .exam-structure {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .exam-structure h4 {
+            color: #0c5460;
+            margin-top: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block after_field_sets %}
+    <div class="bece-exam-help">
+        <h3>📚 BECE Exam Structure Guide</h3>
+        <p>Create comprehensive BECE past papers with proper question organization and support for both multiple-choice and essay questions.</p>
+        
+        <div class="exam-structure">
+            <h4>🎯 Typical BECE Paper Structure:</h4>
+            <ul>
+                <li><strong>Paper 1 (Objective):</strong> 40-50 multiple-choice questions, 1 hour duration</li>
+                <li><strong>Paper 2 (Essay):</strong> 5-8 essay questions, 2-3 hours duration</li>
+                <li><strong>Total Marks:</strong> Usually 100 marks (Paper 1: 50 marks, Paper 2: 50 marks)</li>
+            </ul>
+        </div>
+        
+        <div class="question-type-guide">
+            <strong>💡 Question Type Guidelines:</strong>
+            <ul>
+                <li><strong>Multiple Choice:</strong> Use for Paper 1, typically 1 mark each</li>
+                <li><strong>Essay:</strong> Use for Paper 2, typically 5-15 marks each</li>
+                <li><strong>Short Answer:</strong> Use for brief explanations, 2-5 marks each</li>
+            </ul>
+        </div>
+        
+        <p><strong>🚀 Workflow:</strong></p>
+        <ol>
+            <li>Select the exam year and subject</li>
+            <li>Choose paper type (Paper 1 for objective, Paper 2 for essay)</li>
+            <li>Set duration and total marks</li>
+            <li>Add questions using the inline form below</li>
+            <li>For multiple-choice questions, add answer options</li>
+            <li>For essay questions, provide instructions and marking schemes</li>
+        </ol>
+    </div>
+    
+    {{ block.super }}
+{% endblock %}
+
+{% block submit_buttons_bottom %}
+    <div class="bece-exam-help" style="margin-top: 20px;">
+        <strong>🎓 After Saving:</strong> Your BECE paper will be available for student practice.
+        {% if original.questions.count > 0 %}
+            <br><strong>Current Status:</strong> {{ original.questions.count }} questions added
+            ({{ original.questions.filter:question_type='multiple_choice'|length }} multiple-choice, 
+            {{ original.questions.filter:question_type='essay'|length }} essay)
+        {% endif %}
+        <br><strong>Preview URL:</strong> <code>/api/bece/papers/{{ original.id|default:"[paper-id]" }}/</code>
+    </div>
+    {{ block.super }}
+{% endblock %}

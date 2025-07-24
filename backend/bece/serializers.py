@@ -81,10 +81,23 @@ class BECESubmissionSerializer(serializers.Serializer):
     """Serializer for BECE practice submission"""
     paper_id = serializers.IntegerField()
     answers = serializers.ListField(
-        child=serializers.DictField(
-            child=serializers.CharField()
-        )
+        child=serializers.DictField()
     )
+    
+    def validate_answers(self, value):
+        """Validate answer format"""
+        for answer in value:
+            if 'question_id' not in answer:
+                raise serializers.ValidationError("Each answer must have a question_id")
+            
+            # For multiple choice questions, answer_id is required
+            # For essay questions, text_answer is required
+            if 'answer_id' not in answer and 'text_answer' not in answer:
+                raise serializers.ValidationError(
+                    "Each answer must have either answer_id (for multiple choice) or text_answer (for essay)"
+                )
+        
+        return value
 
 
 class BECEStatisticsSerializer(serializers.ModelSerializer):

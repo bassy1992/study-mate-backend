@@ -37,7 +37,14 @@ def add_courses_to_bece_bundle():
         subjects_data = [
             ('English Language', 'BECE English Language Practice'),
             ('Mathematics', 'BECE Mathematics Practice'),
-            ('Integrated Science', 'BECE Integrated Science Practice')
+            ('Integrated Science', 'BECE Integrated Science Practice'),
+            ('Social Studies', 'BECE Social Studies Practice'),
+            ('Religious and Moral Education', 'BECE RME Practice'),
+            ('Ghanaian Language', 'BECE Ghanaian Language Practice'),
+            ('French', 'BECE French Practice'),
+            ('Information Communication Technology', 'BECE ICT Practice'),
+            ('Career Technology', 'BECE Career Technology Practice'),
+            ('Creative Arts', 'BECE Creative Arts Practice')
         ]
         
         created_courses = []

@@ -22,10 +22,11 @@ def has_bece_access(user):
     # Check if user has purchased BECE bundle
     from ecommerce.models import UserPurchase, Bundle
     try:
-        bece_bundle = Bundle.objects.get(slug='JHS3')
+        bece_bundle = Bundle.objects.get(slug='jhs3-bece-prep')
         return UserPurchase.objects.filter(
             user=user,
-            bundle=bece_bundle
+            bundle=bece_bundle,
+            is_active=True
         ).exists()
     except Bundle.DoesNotExist:
         return False
@@ -156,61 +157,98 @@ def submit_bece_practice(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    # Check if this is an essay paper
+    paper = attempt.paper
+    has_essay_questions = paper.questions.filter(question_type='essay').exists()
+    
     # Process answers
     score = 0
+    essay_questions_count = 0
+    
     for answer_data in answers:
         question_id = answer_data.get('question_id')
         selected_answer_id = answer_data.get('answer_id')
+        text_answer = answer_data.get('text_answer', '')
         
         try:
             question = BECEQuestion.objects.get(id=question_id, paper_id=paper_id)
-            selected_answer = BECEAnswer.objects.get(id=selected_answer_id, question=question)
             
-            is_correct = selected_answer.is_correct
-            marks_earned = question.marks if is_correct else 0
-            score += marks_earned
-            
-            BECEUserAnswer.objects.create(
-                attempt=attempt,
-                question=question,
-                selected_answer=selected_answer,
-                is_correct=is_correct,
-                marks_earned=marks_earned
-            )
+            if question.question_type == 'essay':
+                # Handle essay questions
+                essay_questions_count += 1
+                BECEUserAnswer.objects.create(
+                    attempt=attempt,
+                    question=question,
+                    text_answer=text_answer,
+                    is_correct=False,  # Will be graded manually
+                    marks_earned=0     # Will be updated after manual grading
+                )
+            else:
+                # Handle multiple choice questions
+                selected_answer = BECEAnswer.objects.get(id=selected_answer_id, question=question)
+                is_correct = selected_answer.is_correct
+                marks_earned = question.marks if is_correct else 0
+                score += marks_earned
+                
+                BECEUserAnswer.objects.create(
+                    attempt=attempt,
+                    question=question,
+                    selected_answer=selected_answer,
+                    is_correct=is_correct,
+                    marks_earned=marks_earned
+                )
         except (BECEQuestion.DoesNotExist, BECEAnswer.DoesNotExist):
             continue
     
     # Complete the attempt
     attempt.score = score
-    attempt.percentage = (score / attempt.total_marks) * 100 if attempt.total_marks > 0 else 0
     attempt.is_completed = True
+    
+    # For essay papers, don't calculate percentage yet (pending manual grading)
+    if has_essay_questions:
+        attempt.percentage = 0  # Will be updated after manual grading
+    else:
+        attempt.percentage = (score / attempt.total_marks) * 100 if attempt.total_marks > 0 else 0
+    
     attempt.save()
     
-    # Update user statistics
-    stats, created = BECEStatistics.objects.get_or_create(
-        user=request.user,
-        subject=attempt.paper.subject
-    )
+    # Update user statistics only for non-essay papers
+    if not has_essay_questions:
+        stats, created = BECEStatistics.objects.get_or_create(
+            user=request.user,
+            subject=attempt.paper.subject
+        )
+        
+        stats.total_attempts += 1
+        if attempt.score > stats.best_score:
+            stats.best_score = attempt.score
+        
+        # Calculate average score
+        all_attempts = BECEPracticeAttempt.objects.filter(
+            user=request.user,
+            paper__subject=attempt.paper.subject,
+            is_completed=True
+        )
+        stats.average_score = all_attempts.aggregate(avg=Avg('score'))['avg'] or 0
+        stats.last_attempt = attempt.completed_at
+        stats.save()
     
-    stats.total_attempts += 1
-    if attempt.score > stats.best_score:
-        stats.best_score = attempt.score
-    
-    # Calculate average score
-    all_attempts = BECEPracticeAttempt.objects.filter(
-        user=request.user,
-        paper__subject=attempt.paper.subject,
-        is_completed=True
-    )
-    stats.average_score = all_attempts.aggregate(avg=Avg('score'))['avg'] or 0
-    stats.last_attempt = attempt.completed_at
-    stats.save()
-    
-    return Response({
-        'attempt': BECEPracticeAttemptSerializer(attempt).data,
-        'statistics': BECEStatisticsSerializer(stats).data,
-        'message': 'BECE practice submitted successfully'
-    })
+    # Return different responses based on paper type
+    if has_essay_questions:
+        return Response({
+            'success': True,
+            'submission_type': 'essay',
+            'message': 'Thank you for completing the essay questions.',
+            'show_results': False
+        })
+    else:
+        return Response({
+            'success': True,
+            'submission_type': 'objective',
+            'attempt': BECEPracticeAttemptSerializer(attempt).data,
+            'statistics': BECEStatisticsSerializer(stats).data,
+            'message': 'BECE practice submitted successfully'
+        })
 
 
 class BECEAttemptListView(generics.ListAPIView):
@@ -243,20 +281,21 @@ def bece_dashboard(request):
     # Check if user has purchased BECE bundle
     from ecommerce.models import UserPurchase, Bundle
     try:
-        bece_bundle = Bundle.objects.get(slug='JHS3')
+        bece_bundle = Bundle.objects.get(slug='jhs3-bece-prep')
         has_bece_access = UserPurchase.objects.filter(
             user=request.user,
-            bundle=bece_bundle
+            bundle=bece_bundle,
+            is_active=True
         ).exists()
         
         if not has_bece_access:
             return Response(
-                {'error': 'Premium subscription required'},
+                {'error': 'Premium subscription required. Please purchase the JHS 3 BECE Preparation Package to access this feature.'},
                 status=status.HTTP_403_FORBIDDEN
             )
     except Bundle.DoesNotExist:
         return Response(
-            {'error': 'BECE bundle not available'},
+            {'error': 'BECE bundle not available. Please contact support.'},
             status=status.HTTP_404_NOT_FOUND
         )
     

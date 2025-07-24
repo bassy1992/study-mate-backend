@@ -173,11 +173,18 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField()
     description = models.TextField(blank=True)
-    lesson_type = models.CharField(max_length=20, choices=LESSON_TYPES, default='text')
+    lesson_type = models.CharField(max_length=20, choices=LESSON_TYPES, default='video')
     order = models.IntegerField(default=0)
     duration_minutes = models.IntegerField(default=0)
     is_free = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
+    
+    # Video fields for individual lessons
+    video_url = models.URLField(blank=True, help_text="YouTube, Vimeo, or other video platform URL")
+    video_file = models.FileField(upload_to='lesson_videos/', null=True, blank=True, help_text="Upload video file directly")
+    video_duration = models.IntegerField(default=0, help_text="Duration in seconds")
+    video_thumbnail = models.ImageField(upload_to='lesson_video_thumbnails/', null=True, blank=True)
+    
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -187,6 +194,38 @@ class Lesson(models.Model):
     
     def __str__(self):
         return f"{self.course.title} - {self.title}"
+    
+    @property
+    def has_video(self):
+        """Check if lesson has a video"""
+        return bool(self.video_url or self.video_file)
+    
+    @property
+    def video_embed_url(self):
+        """Get embeddable URL for lesson video"""
+        if self.video_url:
+            from .utils import get_video_embed_url
+            return get_video_embed_url(self.video_url)
+        return None
+    
+    @property
+    def video_thumbnail_url(self):
+        """Get thumbnail URL for lesson video"""
+        if self.video_thumbnail:
+            return self.video_thumbnail.url
+        elif self.video_url:
+            from .utils import get_video_thumbnail_url
+            return get_video_thumbnail_url(self.video_url)
+        return None
+    
+    @property
+    def formatted_video_duration(self):
+        """Get formatted duration string"""
+        if self.video_duration:
+            from .utils import format_duration
+            return format_duration(self.video_duration)
+        return None
+
 
 
 class LessonContent(models.Model):
@@ -330,3 +369,5 @@ class LessonProgress(models.Model):
     
     def __str__(self):
         return f"{self.user.email} - {self.lesson.title}"
+
+

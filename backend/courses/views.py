@@ -249,6 +249,7 @@ def complete_lesson(request, lesson_id):
     })
 
 
+
 class QuizListView(generics.ListAPIView):
     serializer_class = QuizListSerializer
     permission_classes = [permissions.AllowAny]

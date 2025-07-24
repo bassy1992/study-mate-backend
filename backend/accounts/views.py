@@ -548,3 +548,128 @@ def calculate_study_streak(user):
                 break
     
     return streak
+
+@extend_schema(
+    tags=['Authentication'],
+    summary='Delete Account',
+    description='Permanently delete user account and all associated data',
+    responses={
+        200: OpenApiResponse(description='Account deleted successfully'),
+        400: OpenApiResponse(description='Error deleting account')
+    }
+)
+@api_view(['DELETE'])
+@permission_classes([permissions.IsAuthenticated])
+def delete_account(request):
+    """
+    Permanently delete the user's account and all associated data.
+    This action cannot be undone.
+    """
+    try:
+        user = request.user
+        
+        # Log the account deletion for audit purposes
+        print(f"Account deletion requested for user: {user.email} (ID: {user.id})")
+        
+        # Delete the user account (this will cascade delete related data)
+        user.delete()
+        
+        return Response({
+            'message': 'Account deleted successfully'
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        print(f"Error deleting account for user {request.user.email}: {str(e)}")
+        return Response({
+            'error': 'Failed to delete account. Please try again or contact support.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+@extend_schema(
+    tags=['Authentication'],
+    summary='Update User Preferences',
+    description='Update user notification preferences',
+    request={
+        'type': 'object',
+        'properties': {
+            'email_notifications': {'type': 'boolean'},
+            'sms_notifications': {'type': 'boolean'},
+            'marketing_emails': {'type': 'boolean'},
+            'study_reminders': {'type': 'boolean'}
+        }
+    },
+    responses={
+        200: OpenApiResponse(description='Preferences updated successfully'),
+        400: OpenApiResponse(description='Invalid preferences data')
+    }
+)
+@api_view(['PATCH'])
+@permission_classes([permissions.IsAuthenticated])
+def update_preferences(request):
+    """
+    Update user notification preferences
+    """
+    try:
+        user = request.user
+        profile, created = UserProfile.objects.get_or_create(user=user)
+        
+        # Get current preferences or initialize with defaults
+        current_preferences = profile.notification_preferences or {}
+        
+        # Update preferences with provided data
+        preferences_data = {
+            'email_notifications': request.data.get('email_notifications', current_preferences.get('email_notifications', True)),
+            'sms_notifications': request.data.get('sms_notifications', current_preferences.get('sms_notifications', False)),
+            'marketing_emails': request.data.get('marketing_emails', current_preferences.get('marketing_emails', False)),
+            'study_reminders': request.data.get('study_reminders', current_preferences.get('study_reminders', True)),
+        }
+        
+        # Save updated preferences
+        profile.notification_preferences = preferences_data
+        profile.save()
+        
+        return Response({
+            'message': 'Preferences updated successfully',
+            'preferences': preferences_data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        print(f"Error updating preferences for user {request.user.email}: {str(e)}")
+        return Response({
+            'error': 'Failed to update preferences. Please try again.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(
+    tags=['Authentication'],
+    summary='Get User Preferences',
+    description='Get user notification preferences',
+    responses={
+        200: OpenApiResponse(description='User preferences retrieved successfully'),
+    }
+)
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_preferences(request):
+    """
+    Get user notification preferences
+    """
+    try:
+        user = request.user
+        profile, created = UserProfile.objects.get_or_create(user=user)
+        
+        # Get preferences or return defaults
+        preferences = profile.notification_preferences or {
+            'email_notifications': True,
+            'sms_notifications': False,
+            'marketing_emails': False,
+            'study_reminders': True,
+        }
+        
+        return Response({
+            'preferences': preferences
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        print(f"Error getting preferences for user {request.user.email}: {str(e)}")
+        return Response({
+            'error': 'Failed to get preferences.'
+        }, status=status.HTTP_400_BAD_REQUEST)

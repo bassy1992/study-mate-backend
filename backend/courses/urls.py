@@ -11,6 +11,7 @@ urlpatterns = [
     path('courses/<str:level>/<str:subject>/', views.course_by_level_subject, name='course-by-level-subject'),
     path('lessons/<int:id>/', views.LessonDetailView.as_view(), name='lesson-detail'),
     path('lessons/<int:lesson_id>/complete/', views.complete_lesson, name='complete-lesson'),
+
     path('quizzes/', views.QuizListView.as_view(), name='quizzes'),
     path('quizzes/user/', views.get_user_quizzes, name='user-quizzes'),
     path('quizzes/submit/', views.submit_quiz, name='submit-quiz'),
